@@ -3,7 +3,7 @@ const body = document.getElementsByTagName('body')[0];
 const boutonLight = document.getElementById('light');
 const boutonDark = document.getElementById('dark');
 var progressBar = document.querySelector('.progress-bar');
-
+const btns = document.getElementsByClassName('btn');
 // bouton replay
 const btnReplay = document.getElementById('replay');
 //je cache replay en temps normal
@@ -61,7 +61,6 @@ function afficherTableau(){
                 // ex : si i vaut 2 alors c'est ligne 2 et si j vaut 4 c'est le 4èeme élément de la ligne 2
                 txt += "<img src='"+getImage(tableauJeu[i][j])+"'>";
             }
-          
         }
         // je ferme ma div à chaque tour de la première boucle
         txt += "</div>";
@@ -122,7 +121,6 @@ function verif(bouton){
 
         //je mélange les deux tableaux, en appliquant au tableau de jeu le tableau généré automatiquement
         tableauJeu[ligne][colonne] = tableauResultat[ligne][colonne];
-     
         
         // on souhaite réafficher notre grille mise à jour et mélangée
         afficherTableau();
