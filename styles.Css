@@ -1,3 +1,5 @@
+/* import font*/
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
 /* reset css */
 *{
     padding: 0;
@@ -10,13 +12,28 @@ body{
     display: flex;
     align-items: center;
     flex-direction: column;
+
+    background-size: cover;
 }
+a{
+    text-decoration-color: black;
+    color: black;
+}
+a:hover{
+    text-decoration-color: red;
+    color: rgb(34, 36, 36);
+    transition: 0.5s;
+}
+/* header */
 header{
+    display: flex;
     text-align: center;
-    margin: 30px auto;
+    margin: 20px auto;
 }
 header h1{
     margin-bottom: 20px;
+    font-size: 70px;
+    font-family: 'Luckiest Guy', cursive;
 }
 header p{
     font-style: italic;
@@ -25,21 +42,83 @@ header p{
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+}
+/* changement de fond d'écran */ 
+.dark{
+    color: white;
+    background: linear-gradient(to top, #09203f 0%, #537895 100%) no-repeat center center fixed;
+}
+.dark a{
+    color: white;
+    text-decoration-color: white;
+}
+.dark a:hover{
+    color: white;
+    transition: 0.5s;
+    text-decoration-color: rgb(163, 14, 14);
+}
+.light{
+    background: linear-gradient(45deg, #93a5cf 0%, #e4efe9 100%) no-repeat center center fixed;
 }
 /* buttons */ 
-button{
+.cards{
     width: 100px;
     height: 100px;
     margin: 15px;
     box-shadow: 0 5px 10px black;
+    background-image: url(./images/card-question-blue.png);
 }
 button:hover{
     transform: translateY(5px);
     transition: 0.5s;
+    opacity: 0.8;
 }
 /* images */
 img{
     width: 100px;
     height: 100px;
     margin: 15px;
+}
+/* progress*/
+.progress{
+    width: 50%;
+}
+#replay{
+    background-image: url(./images/replay.png);
+    border-radius: 50%;
+    text-shadow: 0 2px 5px black;
+    color: white;
+    font-weight: bold;
+    width: 100px;
+    height: 100px;
+    margin: 15px;
+    box-shadow: 0 5px 10px black;
+}
+/* dark / light mode */
+.right{
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    right: 0;
+    top: 0;
+    margin: 5px 10px 0 0;
+}
+.right button{
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+}
+.right #light{
+    background-image: url(./images/light-bulb-light-ps.png);
+    background-position: center;
+}
+.right #dark{
+    background-image: url(./images/light-bulb-dark-ps.png);
+    background-position: center;
+}
+/* footer */
+footer{
+    margin-top:20px;;
 }

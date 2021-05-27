@@ -1,4 +1,17 @@
 const divResultat = document.getElementById('resultat');
+const body = document.getElementsByTagName('body')[0];
+const boutonLight = document.getElementById('light');
+const boutonDark = document.getElementById('dark');
+var progressBar = document.querySelector('.progress-bar');
+
+// bouton replay
+const btnReplay = document.getElementById('replay');
+//je cache replay en temps normal
+btnReplay.style.display="none";
+
+var win=false;
+
+var score=0;
 
 // je fabrique le tableau qui va correspondre à ma grille de jeu 
 var tableauJeu = [
@@ -9,12 +22,13 @@ var tableauJeu = [
 ];
 
 // tableau des images, généré aléatoirement
-var tableauResultat = [
-    [1,2,3,4],
-    [1,2,3,4],
-    [8,7,5,6],
-    [8,7,5,6]
-];
+// var tableauResultat = [
+//     [1,2,3,4],
+//     [1,2,3,4],
+//     [8,7,5,6],
+//     [8,7,5,6]
+// ];
+var tableauResultat = genereTableauAleatoire();
 
 // tableau qui conserve la ligne et la colonne du dernier clic avant le miens
 var ancienneSelection = [];
@@ -38,7 +52,7 @@ function afficherTableau(){
             // je mets une condition en place : si la valeur de mon tableau vaut 0 ALORS j'affiche le bouton
             if(tableauJeu[i][j] === 0){
                 // à chaque tour de boucle, je crée dans chaque div plus haut, un boutton afficher
-                txt += "<button class='btn btn-primary' onClick='verif(\""+i+"-"+j+"\")'>Afficher</button>";
+                txt += "<button class='btn btn-dark cards' onClick='verif(\""+i+"-"+j+"\")'></button>";
             }
             // sinon, j'affiche une image
             else{
@@ -92,37 +106,116 @@ function getImage(valeur){
 
 // recupère l'index de l'élément cliqué
 function verif(bouton){
-    // j'ajoute +1 à nbAffiche dès lors que je clic sur un bouton
-    nbAffiche++;
+    // d'abord on vérifie si ready vaut true
+    if(ready){
+        // j'ajoute +1 à nbAffiche dès lors que je clic sur un bouton
+        nbAffiche++;
 
-    // substrg permet de découper une chaine de caractère, on cherche à récupérer la ligne, donc le premier des 2 
-    // paramètres transmis dans verif() lors du onClick
-    // le premier paramètre de substr est le début de l'interval, et le second est le nb de caractères après le début
-    var ligne = bouton.substr(0,1);
-    console.log("ligne : " + ligne);
+        // substrg permet de découper une chaine de caractère, on cherche à récupérer la ligne, donc le premier des 2 
+        // paramètres transmis dans verif() lors du onClick
+        // le premier paramètre de substr est le début de l'interval, et le second est le nb de caractères après le début
+        var ligne = bouton.substr(0,1);
+        // console.log("ligne : " + ligne);
 
-    var colonne = bouton.substr(2,1);
-    console.log("colonne : " + colonne);
+        var colonne = bouton.substr(2,1);
+        // console.log("colonne : " + colonne);
 
-    //je mélange les deux tableaux, en appliquant au tableau de jeu le tableau généré automatiquement
-    tableauJeu[ligne][colonne] = tableauResultat[ligne][colonne];
-    
-    // on souhaite réafficher notre grille mise à jour et mélangée
-    afficherTableau();
+        //je mélange les deux tableaux, en appliquant au tableau de jeu le tableau généré automatiquement
+        tableauJeu[ligne][colonne] = tableauResultat[ligne][colonne];
+     
+        
+        // on souhaite réafficher notre grille mise à jour et mélangée
+        afficherTableau();
 
-    // vérifions le nombre d'éléments retournés, s'il est supérieur à 1 donc 2 alors...
-    if(nbAffiche > 1){
-        //vérifications entre l'image retournée juste avant et celle que je viens de retourner
-        if(tableauJeu[ligne][colonne] !== tableauResultat[ancienneSelection[0]][ancienneSelection[1]]){
-            // on réinitialise les deux derniers clics car ce n'est pas bon
-            tableauJeu[ligne][colonne] = 0;
-            tableauJeu[ancienneSelection[0]][ancienneSelection[1]] = 0;
+        // vérifions le nombre d'éléments retournés, s'il est supérieur à 1 donc 2 alors...
+        if(nbAffiche > 1){
+            //si on a déjà retourné deux cartes, alors nous ne sommes pas prêt pour en retourner une autre
+            ready = false;
+            // on réalise un temps d'arrêt avant de mettre ready en vrai, on va lui dire de mettre en pause
+            // un certain temps, exprimé en millisecondes
+            setTimeout( () =>{
+                //vérifications entre l'image retournée juste avant et celle que je viens de retourner
+                if(tableauJeu[ligne][colonne] !== tableauResultat[ancienneSelection[0]][ancienneSelection[1]]){
+                    
+                    // on réinitialise les deux derniers clics car ce n'est pas bon
+                    tableauJeu[ligne][colonne] = 0;
+                    tableauJeu[ancienneSelection[0]][ancienneSelection[1]] = 0;
+                }
+                else{
+                    score++;
+                    // console.log(score);
+                    var scorePourcent = score * 12.5;
+                    progressBar.innerHTML= score+"/8";
+                    progressBar.style.width=scorePourcent+"%";
+                    progressBar.setAttribute('aria-valuenow', scorePourcent);
+                    if(score == 8){
+                        btnReplay.style.display="block";
+                        win=true;
+                        body.style.backgroundImage="linear-gradient(to top, #ff0844 0%, #ffb199 100%)";
+                    }
+                }
+                afficherTableau();
+                // on réactive l'autorisation de retourner une carte
+                ready = true;
+                // on réinitialise nbAffiche à 0 ce qui permettra de relancer une vérification 
+                nbAffiche = 0;
+                // on récupère les coordonnées de la ligne et de la colonne et on les attribues à ancienneSelection
+                ancienneSelection = [ligne,colonne];
+            },500)
         }
-
-        // on réinitialise nbAffiche à 0 ce qui permettra de relancer une vérification 
-        nbAffiche = 0;
+        // si nbAffiche est inférieur à 2 alors on conserve la sélection précédante et on attend sagement la nouvelle
+        else{
+            // il nous faut conserver la vieille sélection afin de pouvoir vérifier si la nouvelle correspond avec l'ancienne
+            ancienneSelection = [ligne,colonne];
+        }
     }
-
-    // il nous faut conserver la vieille sélection afin de pouvoir vérifier si la nouvelle correspond avec l'ancienne
-    ancienneSelection = [ligne][colonne];
 }
+   
+// fonction qui génére un tableau aléatoire
+function genereTableauAleatoire(){
+    var tableau = [];
+
+    //  tableau qui stock les valeurs des 8 images
+    var nbImagePosition=[0,0,0,0,0,0,0,0];
+
+    //je boucle sur mon tableau à 1 étage
+    for(var i=0; i < 4 ; i++){
+        // à chaque tour de boucle, je crée un sous tableau pour chaque ligne
+        var ligne = [];
+
+        //je dois ajouter les colonnes au sein des lignes 
+        for(var j=0; j < 4; j++){
+            // bascule en true si on a bien 2 images de chaque dans le tableau
+            var fin = false;
+
+            // tant que fin = false je continue de boucler
+            // c'est à dire tant que nombre nbImagePosition[randomImage] est inférieur à 2
+            while(!fin){
+                // je pousse dans ma ligne, une valeur aléatoire entre 1 et 8 inclus
+                var randomImage= Math.floor(Math.random() * 8);
+
+                // je vérifie que je n'ai pas plus de 2 fois la même image
+                if(nbImagePosition[randomImage] < 2){
+                    // +1 car le random number va de 0 à 7 et nos images vont de 1 à 8
+                    ligne.push(randomImage+1);
+
+                    //
+                    nbImagePosition[randomImage]++;
+                    fin = true;
+                }
+            }  
+        }
+        // j'envoie ma ligne au tableau à chaque tour de boucle
+        tableau.push(ligne);
+    }
+    return tableau;
+}
+
+function goLight(){
+    body.className="light";
+}
+
+function goDark(){
+    body.className="dark";
+}
+
