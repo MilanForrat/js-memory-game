@@ -117,6 +117,23 @@ img{
     background-image: url(./images/light-bulb-dark-ps.png);
     background-position: center;
 }
+/* gestion des confettis de la victoire */
+.slot{
+    position: relative;
+    /* règle la profondeur pour exploiter la perspective */
+    perspective: 1000px;;
+}
+.slot div{
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* empêcher l'utilisateur de sélectionner les émojis */
+    user-select: none;
+}
 /* footer */
 footer{
     margin-top:20px;;

@@ -4,6 +4,10 @@ const boutonLight = document.getElementById('light');
 const boutonDark = document.getElementById('dark');
 var progressBar = document.querySelector('.progress-bar');
 const btns = document.getElementsByClassName('btn');
+const containerSlot = document.querySelector('.slot');
+containerSlot.style.display="none";
+// tableau d'emoji pour la victoire
+const emoji = ["bravo", "c'est gagné", "trop fort !","💪", "👌", "👏", "👍", "🎯","🧩", "🐒","🥇","👁️","🧠","👀", "🐷", "🐘", "🐑", "🐾", "🤪", "🙃","🦓","🦌","🐮","🦙","🐂","🐃","🐄"];
 // bouton replay
 const btnReplay = document.getElementById('replay');
 //je cache replay en temps normal
@@ -45,8 +49,7 @@ function afficherTableau(){
     // je boucle mon tableau grâce à length qui va parcourir le premier étage (soit 4 éléments)
     for(var i=0; i < tableauJeu.length; i++){
         // à chaque tour de boucle, je crée une div, donc 4 div
-        txt += "<div>";
-
+        txt += "<div class='ligne'>";
         // je boucle mon tableau étage par étage grâce à [i] et length (soit 4 éléments aussi)
         for(var j=0; j < tableauJeu[i].length; j++){
             // je mets une condition en place : si la valeur de mon tableau vaut 0 ALORS j'affiche le bouton
@@ -110,7 +113,7 @@ function verif(bouton){
         // j'ajoute +1 à nbAffiche dès lors que je clic sur un bouton
         nbAffiche++;
 
-        // substrg permet de découper une chaine de caractère, on cherche à récupérer la ligne, donc le premier des 2 
+        // substr permet de découper une chaine de caractère, on cherche à récupérer la ligne, donc le premier des 2 
         // paramètres transmis dans verif() lors du onClick
         // le premier paramètre de substr est le début de l'interval, et le second est le nb de caractères après le début
         var ligne = bouton.substr(0,1);
@@ -150,6 +153,7 @@ function verif(bouton){
                         btnReplay.style.display="block";
                         win=true;
                         body.style.backgroundImage="linear-gradient(to top, #ff0844 0%, #ffb199 100%)";
+                        animateConfetti();
                     }
                 }
                 afficherTableau();
@@ -157,8 +161,7 @@ function verif(bouton){
                 ready = true;
                 // on réinitialise nbAffiche à 0 ce qui permettra de relancer une vérification 
                 nbAffiche = 0;
-                // on récupère les coordonnées de la ligne et de la colonne et on les attribues à ancienneSelection
-                ancienneSelection = [ligne,colonne];
+  
             },500)
         }
         // si nbAffiche est inférieur à 2 alors on conserve la sélection précédante et on attend sagement la nouvelle
@@ -173,14 +176,14 @@ function verif(bouton){
 function genereTableauAleatoire(){
     var tableau = [];
 
-    //  tableau qui stock les valeurs des 8 images
+    //  tableau qui stock le nombre de fois qu'on a une valeur 
     var nbImagePosition=[0,0,0,0,0,0,0,0];
 
     //je boucle sur mon tableau à 1 étage
     for(var i=0; i < 4 ; i++){
         // à chaque tour de boucle, je crée un sous tableau pour chaque ligne
         var ligne = [];
-
+        
         //je dois ajouter les colonnes au sein des lignes 
         for(var j=0; j < 4; j++){
             // bascule en true si on a bien 2 images de chaque dans le tableau
@@ -197,7 +200,7 @@ function genereTableauAleatoire(){
                     // +1 car le random number va de 0 à 7 et nos images vont de 1 à 8
                     ligne.push(randomImage+1);
 
-                    //
+                    // comme je n'ai pas plus de 2 fois la même image, je rajoute 1 à l'index [randomImage] de la variable nbImagePosition
                     nbImagePosition[randomImage]++;
                     fin = true;
                 }
@@ -216,4 +219,61 @@ function goLight(){
 function goDark(){
     body.className="dark";
 }
+
+
+
+function fiesta(){
+
+    // si l'animation est en cours d'éxécution, alors ne fais rien
+    if(isTweening()) return;
+
+    for(let i = 0; i < 150; i++){
+        // je créé une div en html
+        const confetti = document.createElement('div');
+        // j'insère dans la div 1 emoji, au hasard parmi le tableau d'emoji
+        confetti.innerText = emoji[Math.floor(Math.random() * emoji.length)];
+        // j'ajoute ma div à la div html "slot" (je lui ajoute un enfant)
+        containerSlot.appendChild(confetti);
+    }
+
+}
+fiesta();
+
+function animateConfetti(){
+    containerSlot.style.display="block";
+    // on utilise Green Sock, la librarie d'animation JS
+    const TLCONF = gsap.timeline();
+
+    TLCONF
+    // je prends toutes mes slots div... et je leur mets uine animation de départ
+    .to('.slot div', {
+        // je les bouge sur Y (vertical) de -100 à 100 (exprimés en pixels)
+        y: "random(-100,100)",
+        // je les bouge sur X (horizontal) de -100 à 100
+        x: "random(-100,100)",
+        // je les bouge sur Z (perspective) de -1000 à 1000 (on a définit notre perspective dans le css)
+        z: "random(-1000,1000)",
+
+        // faire touner les émojis (exprimé en degrés)
+        rotation: "random(-90,90)",
+        // temps de l'animation
+        duration: 5
+    })
+    // animation de fin
+    // autoAlpha gère l'opacité et la visibilité en une propriété
+    // duration gère le temps que met l'animation de fin exprimé en s
+    .to('.slot div', {autoAlpha: 0, duration: 0.3}, '-=0.2')
+
+    // il faut nettoyer le DOM pour éviter d'avoir les confettis sur le navigateur inutilement
+    .add(() => {
+        // je vide le contenu du container
+        containerSlot.innerHTML ="";
+    })
+}
+
+// fonction qui renvoit true si l'animation est en cours
+function isTweening(){
+    return gsap.isTweening('.slot div');
+}
+console.log(tableauResultat);
 
